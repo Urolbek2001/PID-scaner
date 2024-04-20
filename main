@@ -1,0 +1,46 @@
+import psutil
+import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
+import time
+
+def get_process_info(pid):
+    try:
+        process = psutil.Process(pid)
+        memory_percent = process.memory_percent()
+        cpu_percent = process.cpu_percent(interval=1)
+        return memory_percent, cpu_percent
+    except psutil.NoSuchProcess:
+        return None, None
+
+def update_plot(frame):
+    memory_percent, cpu_percent = get_process_info(pid)
+    if memory_percent is not None and cpu_percent is not None:
+        memory_percent_list.append(memory_percent)
+        cpu_percent_list.append(cpu_percent)
+        time_list.append(time.time())
+        
+        ax.clear()
+        ax.plot(time_list, memory_percent_list, label="Xotira foizi", color='blue')
+        ax.plot(time_list, cpu_percent_list, label="CPU foizi", color='red')
+        ax.legend()
+        ax.grid(True)
+
+def main():
+    global pid, memory_percent_list, cpu_percent_list, time_list, ax
+    
+    pid = int(input("PID qiymatni kiriting: "))
+    memory_percent_list = []
+    cpu_percent_list = []
+    time_list = []
+    
+    fig, ax = plt.subplots(figsize=(10, 5))
+    ani = FuncAnimation(fig, update_plot, interval=1000, cache_frame_data=False)
+    
+    plt.title(f"Statistika: {pid}")
+    plt.xlabel("Vaqt (seconds)")
+    plt.ylabel("Foiz ko'rsatgichi")
+    plt.grid(True)
+    plt.show()
+
+if name == "main":
+    main()
